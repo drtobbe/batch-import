@@ -8,4 +8,4 @@ target
 *.csv
 .DS_Store
 .settings
-
+.classpath

@@ -33,6 +33,7 @@ import org.neo4j.kernel.impl.util.FileUtils;
 import org.neo4j.kernel.impl.util.StringLogger;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -897,7 +898,14 @@ public class BatchInserterImpl implements BatchInserter
     {
         if ( !fileSystem.fileExists( dir ) )
         {
-            if ( !fileSystem.mkdirs( dir ) )
+        	try {
+				fileSystem.mkdirs( dir );
+			} catch (IOException e) {
+                throw new UnderlyingStorageException(
+                        "Unable to create directory path["
+                                + dir + "] for Neo4j kernel store." );
+			}
+            if ( !fileSystem.fileExists( dir ) )
             {
                 throw new UnderlyingStorageException(
                         "Unable to create directory path["

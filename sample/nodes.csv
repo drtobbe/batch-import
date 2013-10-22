@@ -1,5 +1,5 @@
-name	age	__type__	works_on
-Michael	37	Concept	neo4j
-Selina	14	Concept	neo4j
-Rana	6	Concept	manne
-Selma	4	Concept	manne
+id	__type__
+Michael	Concept
+Selina	Concept
+Rana	Concept
+Selma	Concept

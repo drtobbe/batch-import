@@ -1,22 +1,28 @@
 package org.neo4j.batchimport;
 
+import static org.neo4j.index.impl.lucene.LuceneIndexImplementation.EXACT_CONFIG;
+import static org.neo4j.index.impl.lucene.LuceneIndexImplementation.FULLTEXT_CONFIG;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Map;
+
 import org.neo4j.batchimport.importer.RelType;
 import org.neo4j.batchimport.importer.RowData;
 import org.neo4j.index.lucene.unsafe.batchinsert.LuceneBatchInserterIndexProvider;
 import org.neo4j.kernel.impl.util.FileUtils;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
-import org.neo4j.unsafe.batchinsert.BatchInserters;
-import org.neo4j.unsafe.batchinsert.BatchInserterIndexProvider;
 import org.neo4j.unsafe.batchinsert.BatchInserterIndex;
-
-import java.io.*;
-import java.util.*;
-
-import static org.neo4j.index.impl.lucene.LuceneIndexImplementation.EXACT_CONFIG;
-import static org.neo4j.index.impl.lucene.LuceneIndexImplementation.FULLTEXT_CONFIG;
+import org.neo4j.unsafe.batchinsert.BatchInserterIndexProvider;
+import org.neo4j.unsafe.batchinsert.BatchInserters;
 
 public class Importer {
-    private static Report report;
+    private static final String UTF8 = "UTF-8";
+	private static Report report;
     private BatchInserter db;
     private BatchInserterIndexProvider lucene;
     
@@ -54,13 +60,13 @@ public class Importer {
         Importer importer = new Importer(graphDb);
         try {
             if (nodesFile.exists()) {
-                importer.importNodes(new FileReader(nodesFile));
+                importer.importNodes(new InputStreamReader(new FileInputStream(nodesFile), UTF8));
             } else {
                 System.err.println("Nodes file "+nodesFile+" does not exist");
             }
 
             if (relationshipsFile.exists()) {
-                importer.importRelationships(new FileReader(relationshipsFile));
+                importer.importRelationships(new InputStreamReader(new FileInputStream(relationshipsFile), UTF8));
             } else {
                 System.err.println("Relationships file "+relationshipsFile+" does not exist");
             }
@@ -151,6 +157,6 @@ public class Importer {
             return;
         }
         BatchInserterIndex index = elementType.equals("node_index") ? nodeIndexFor(indexName, indexType) : relationshipIndexFor(indexName, indexType);
-        importIndex(indexName, index, new FileReader(indexFile));
+        importIndex(indexName, index, new InputStreamReader(new FileInputStream(indexFile), UTF8));
     }
 }

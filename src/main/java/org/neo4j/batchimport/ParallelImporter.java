@@ -1,5 +1,20 @@
 package org.neo4j.batchimport;
 
+import static java.util.Arrays.asList;
+import static org.neo4j.helpers.collection.MapUtil.stringMap;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.neo4j.batchimport.importer.Type;
 import org.neo4j.batchimport.structs.NodeStruct;
@@ -11,16 +26,6 @@ import org.neo4j.consistency.ConsistencyCheckTool;
 import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.kernel.impl.util.FileUtils;
 import org.neo4j.unsafe.batchinsert.BatchInserterImpl;
-
-import java.io.*;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import static java.util.Arrays.asList;
-import static org.neo4j.helpers.collection.MapUtil.stringMap;
 
 // -server -d64 -Xmx4G -XX:+UseParNewGC
 
@@ -50,11 +55,9 @@ import static org.neo4j.helpers.collection.MapUtil.stringMap;
 // todo class for import information
 
 public class ParallelImporter implements NodeStructFactory {
-
+    private static final String UTF8 = "UTF-8";
     private static final int MEGABYTE = 1024 * 1024;
-
     private final static Logger log = Logger.getLogger(ParallelImporter.class);
-
     private static final File PROP_FILE = new File("batch.properties");
     private DisruptorBatchInserter inserter;
     private final File graphDb;
@@ -213,7 +216,7 @@ public class ParallelImporter implements NodeStructFactory {
 
     private Reader readerFor(String file) throws IOException {
         if (file.startsWith("http")) return new InputStreamReader(new URL(file).openStream());
-        if (new File(file).exists()) return new FileReader(file);
+        if (new File(file).exists()) return new InputStreamReader(new FileInputStream(file), UTF8);
         throw new IOException("Input File "+file+" does not exist");
     }
 
